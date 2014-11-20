@@ -531,7 +531,8 @@ var blockOne = rddwire.MsgBlock{
 					},
 				},
 			},
-			LockTime: 0,
+			LockTime:  0,
+			Timestamp: time.Unix(0, 0),
 		},
 	},
 }

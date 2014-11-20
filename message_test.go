@@ -92,7 +92,7 @@ func TestMessage(t *testing.T) {
 		{msgInv, msgInv, pver, rddwire.MainNet, 25},
 		{msgGetData, msgGetData, pver, rddwire.MainNet, 25},
 		{msgNotFound, msgNotFound, pver, rddwire.MainNet, 25},
-		{msgTx, msgTx, pver, rddwire.MainNet, 34},
+		{msgTx, msgTx, pver, rddwire.MainNet, 38},
 		{msgPing, msgPing, pver, rddwire.MainNet, 32},
 		{msgPong, msgPong, pver, rddwire.MainNet, 32},
 		{msgGetHeaders, msgGetHeaders, pver, rddwire.MainNet, 61},

@@ -7,6 +7,7 @@ package rddwire_test
 import (
 	"bytes"
 	"io"
+	"time"
 	"reflect"
 	"testing"
 
@@ -123,7 +124,7 @@ func TestTx(t *testing.T) {
 // TestTxSha tests the ability to generate the hash of a transaction accurately.
 func TestTxSha(t *testing.T) {
 	// Hash of first transaction from block 113875.
-	hashStr := "f051e59b5e2503ac626d03aaeac8ab7be2d72ba4b7e97119c5852d70d52dcb86"
+	hashStr := "d4eea3eb247a211dc079e3bf0a45f24c565dd5de3450c85142641705430b5034"
 	wantHash, err := rddwire.NewShaHashFromStr(hashStr)
 	if err != nil {
 		t.Errorf("NewShaHashFromStr: %v", err)
@@ -159,6 +160,7 @@ func TestTxSha(t *testing.T) {
 	msgTx.AddTxIn(&txIn)
 	msgTx.AddTxOut(&txOut)
 	msgTx.LockTime = 0
+	msgTx.Timestamp = time.Unix(0, 0)
 
 	// Ensure the hash produced is expected.
 	txHash, err := msgTx.TxSha()
@@ -177,6 +179,7 @@ func TestTxWire(t *testing.T) {
 	// Empty tx message.
 	noTx := rddwire.NewMsgTx()
 	noTx.Version = 1
+	noTx.Timestamp = time.Unix(0, 0)
 	noTxEncoded := []byte{
 		0x01, 0x00, 0x00, 0x00, // Version
 		0x00,                   // Varint for number of input transactions
@@ -373,6 +376,7 @@ func TestTxWireErrors(t *testing.T) {
 func TestTxSerialize(t *testing.T) {
 	noTx := rddwire.NewMsgTx()
 	noTx.Version = 1
+	noTx.Timestamp = time.Unix(0, 0)
 	noTxEncoded := []byte{
 		0x01, 0x00, 0x00, 0x00, // Version
 		0x00,                   // Varint for number of input transactions
@@ -603,7 +607,7 @@ func TestTxSerializeSize(t *testing.T) {
 		{noTx, 10},
 
 		// Transcaction with an input and an output.
-		{multiTx, 134},
+		{multiTx, 138},
 	}
 
 	t.Logf("Running %d tests", len(tests))
@@ -619,7 +623,7 @@ func TestTxSerializeSize(t *testing.T) {
 
 // multiTx is a MsgTx with an input and output and used in various tests.
 var multiTx = &rddwire.MsgTx{
-	Version: 1,
+	Version: 2,
 	TxIn: []*rddwire.TxIn{
 		{
 			PreviousOutPoint: rddwire.OutPoint{
@@ -651,12 +655,13 @@ var multiTx = &rddwire.MsgTx{
 		},
 	},
 	LockTime: 0,
+	Timestamp: time.Unix(1406060223, 0),
 }
 
 // multiTxEncoded is the wire encoded bytes for multiTx using protocol version
 // 60002 and is used in the various tests.
 var multiTxEncoded = []byte{
-	0x01, 0x00, 0x00, 0x00, // Version
+	0x02, 0x00, 0x00, 0x00, // Version
 	0x01, // Varint for number of input transactions
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -681,4 +686,5 @@ var multiTxEncoded = []byte{
 	0xa6,                   // 65-byte signature
 	0xac,                   // OP_CHECKSIG
 	0x00, 0x00, 0x00, 0x00, // Lock time
+	0xbf, 0xc6, 0xce, 0x53, // Timestamp
 }

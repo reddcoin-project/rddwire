@@ -9,11 +9,15 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"time"
 )
 
 const (
 	// TxVersion is the current latest supported transaction version.
-	TxVersion = 1
+	TxVersion = 2
+
+	// PowTxVersion is the last supported transaction version before PoSV.
+	PowTxVersion = 1
 
 	// MaxTxInSequenceNum is the maximum sequence number the sequence field
 	// of a transaction input can be.
@@ -137,6 +141,10 @@ type MsgTx struct {
 	TxIn     []*TxIn
 	TxOut    []*TxOut
 	LockTime uint32
+
+	// Time the transaction was created.  This is, unfortunately, encoded as a
+	// uint32 on the wire and therefore is limited to 2106.
+	Timestamp time.Time
 }
 
 // AddTxIn adds a transaction input to the message.
@@ -174,10 +182,11 @@ func (msg *MsgTx) Copy() *MsgTx {
 	// Create new tx and start by copying primitive values and making space
 	// for the transaction inputs and outputs.
 	newTx := MsgTx{
-		Version:  msg.Version,
-		TxIn:     make([]*TxIn, 0, len(msg.TxIn)),
-		TxOut:    make([]*TxOut, 0, len(msg.TxOut)),
-		LockTime: msg.LockTime,
+		Version:   msg.Version,
+		TxIn:      make([]*TxIn, 0, len(msg.TxIn)),
+		TxOut:     make([]*TxOut, 0, len(msg.TxOut)),
+		LockTime:  msg.LockTime,
+		Timestamp: msg.Timestamp,
 	}
 
 	// Deep copy the old TxIn data.
@@ -298,6 +307,17 @@ func (msg *MsgTx) BtcDecode(r io.Reader, pver uint32) error {
 	}
 	msg.LockTime = binary.LittleEndian.Uint32(buf[:])
 
+	if msg.Version > PowTxVersion {
+		_, err = io.ReadFull(r, buf[:])
+		if err != nil {
+			return err
+		}
+		sec := binary.LittleEndian.Uint32(buf[:])
+		msg.Timestamp = time.Unix(int64(sec), 0)
+	} else {
+		msg.Timestamp = time.Unix(0, 0)
+	}
+
 	return nil
 }
 
@@ -362,6 +382,15 @@ func (msg *MsgTx) BtcEncode(w io.Writer, pver uint32) error {
 		return err
 	}
 
+	if msg.Version > PowTxVersion {
+		sec := uint32(msg.Timestamp.Unix())
+		binary.LittleEndian.PutUint32(buf[:], sec)
+		_, err = w.Write(buf[:])
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -399,6 +428,11 @@ func (msg *MsgTx) SerializeSize() int {
 		n += txOut.SerializeSize()
 	}
 
+	// + Timestamp 4 bytes
+	if msg.Version > PowTxVersion {
+		n += 4
+	}
+
 	return n
 }
 
@@ -421,9 +455,10 @@ func (msg *MsgTx) MaxPayloadLength(pver uint32) uint32 {
 // future.
 func NewMsgTx() *MsgTx {
 	return &MsgTx{
-		Version: TxVersion,
-		TxIn:    make([]*TxIn, 0, defaultTxInOutAlloc),
-		TxOut:   make([]*TxOut, 0, defaultTxInOutAlloc),
+		Version:   TxVersion,
+		TxIn:      make([]*TxIn, 0, defaultTxInOutAlloc),
+		TxOut:     make([]*TxOut, 0, defaultTxInOutAlloc),
+		Timestamp: time.Unix(time.Now().Unix(), 0),
 	}
 }
 
