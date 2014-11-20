@@ -2,7 +2,7 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
@@ -10,20 +10,20 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestPing tests the MsgPing API against the latest protocol version.
 func TestPing(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
 	// Ensure we get the same nonce back out.
-	nonce, err := btcwire.RandomUint64()
+	nonce, err := rddwire.RandomUint64()
 	if err != nil {
 		t.Errorf("RandomUint64: Error generating nonce: %v", err)
 	}
-	msg := btcwire.NewMsgPing(nonce)
+	msg := rddwire.NewMsgPing(nonce)
 	if msg.Nonce != nonce {
 		t.Errorf("NewMsgPing: wrong nonce - got %v, want %v",
 			msg.Nonce, nonce)
@@ -52,13 +52,13 @@ func TestPing(t *testing.T) {
 // BIP0031Version.
 func TestPingBIP0031(t *testing.T) {
 	// Use the protocol version just prior to BIP0031Version changes.
-	pver := btcwire.BIP0031Version
+	pver := rddwire.BIP0031Version
 
-	nonce, err := btcwire.RandomUint64()
+	nonce, err := rddwire.RandomUint64()
 	if err != nil {
 		t.Errorf("RandomUint64: Error generating nonce: %v", err)
 	}
-	msg := btcwire.NewMsgPing(nonce)
+	msg := rddwire.NewMsgPing(nonce)
 	if msg.Nonce != nonce {
 		t.Errorf("NewMsgPing: wrong nonce - got %v, want %v",
 			msg.Nonce, nonce)
@@ -81,7 +81,7 @@ func TestPingBIP0031(t *testing.T) {
 	}
 
 	// Test decode with old protocol version.
-	readmsg := btcwire.NewMsgPing(0)
+	readmsg := rddwire.NewMsgPing(0)
 	err = readmsg.BtcDecode(&buf, pver)
 	if err != nil {
 		t.Errorf("decode of MsgPing failed [%v] err <%v>", buf, err)
@@ -99,11 +99,11 @@ func TestPingBIP0031(t *testing.T) {
 // TestPingCrossProtocol tests the MsgPing API when encoding with the latest
 // protocol version and decoding with BIP0031Version.
 func TestPingCrossProtocol(t *testing.T) {
-	nonce, err := btcwire.RandomUint64()
+	nonce, err := rddwire.RandomUint64()
 	if err != nil {
 		t.Errorf("RandomUint64: Error generating nonce: %v", err)
 	}
-	msg := btcwire.NewMsgPing(nonce)
+	msg := rddwire.NewMsgPing(nonce)
 	if msg.Nonce != nonce {
 		t.Errorf("NewMsgPing: wrong nonce - got %v, want %v",
 			msg.Nonce, nonce)
@@ -111,14 +111,14 @@ func TestPingCrossProtocol(t *testing.T) {
 
 	// Encode with latest protocol version.
 	var buf bytes.Buffer
-	err = msg.BtcEncode(&buf, btcwire.ProtocolVersion)
+	err = msg.BtcEncode(&buf, rddwire.ProtocolVersion)
 	if err != nil {
 		t.Errorf("encode of MsgPing failed %v err <%v>", msg, err)
 	}
 
 	// Decode with old protocol version.
-	readmsg := btcwire.NewMsgPing(0)
-	err = readmsg.BtcDecode(&buf, btcwire.BIP0031Version)
+	readmsg := rddwire.NewMsgPing(0)
+	err = readmsg.BtcDecode(&buf, rddwire.BIP0031Version)
 	if err != nil {
 		t.Errorf("decode of MsgPing failed [%v] err <%v>", buf, err)
 	}
@@ -134,33 +134,33 @@ func TestPingCrossProtocol(t *testing.T) {
 // versions.
 func TestPingWire(t *testing.T) {
 	tests := []struct {
-		in   btcwire.MsgPing // Message to encode
-		out  btcwire.MsgPing // Expected decoded message
+		in   rddwire.MsgPing // Message to encode
+		out  rddwire.MsgPing // Expected decoded message
 		buf  []byte          // Wire encoding
 		pver uint32          // Protocol version for wire encoding
 	}{
 		// Latest protocol version.
 		{
-			btcwire.MsgPing{Nonce: 123123}, // 0x1e0f3
-			btcwire.MsgPing{Nonce: 123123}, // 0x1e0f3
+			rddwire.MsgPing{Nonce: 123123}, // 0x1e0f3
+			rddwire.MsgPing{Nonce: 123123}, // 0x1e0f3
 			[]byte{0xf3, 0xe0, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00},
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version BIP0031Version+1
 		{
-			btcwire.MsgPing{Nonce: 456456}, // 0x6f708
-			btcwire.MsgPing{Nonce: 456456}, // 0x6f708
+			rddwire.MsgPing{Nonce: 456456}, // 0x6f708
+			rddwire.MsgPing{Nonce: 456456}, // 0x6f708
 			[]byte{0x08, 0xf7, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00},
-			btcwire.BIP0031Version + 1,
+			rddwire.BIP0031Version + 1,
 		},
 
 		// Protocol version BIP0031Version
 		{
-			btcwire.MsgPing{Nonce: 789789}, // 0xc0d1d
-			btcwire.MsgPing{Nonce: 0},      // No nonce for pver
+			rddwire.MsgPing{Nonce: 789789}, // 0xc0d1d
+			rddwire.MsgPing{Nonce: 0},      // No nonce for pver
 			[]byte{},                       // No nonce for pver
-			btcwire.BIP0031Version,
+			rddwire.BIP0031Version,
 		},
 	}
 
@@ -180,7 +180,7 @@ func TestPingWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var msg btcwire.MsgPing
+		var msg rddwire.MsgPing
 		rbuf := bytes.NewReader(test.buf)
 		err = msg.BtcDecode(rbuf, test.pver)
 		if err != nil {
@@ -198,10 +198,10 @@ func TestPingWire(t *testing.T) {
 // TestPingWireErrors performs negative tests against wire encode and decode
 // of MsgPing to confirm error paths work correctly.
 func TestPingWireErrors(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
 	tests := []struct {
-		in       *btcwire.MsgPing // Value to encode
+		in       *rddwire.MsgPing // Value to encode
 		buf      []byte           // Wire encoding
 		pver     uint32           // Protocol version for wire encoding
 		max      int              // Max size of fixed buffer to induce errors
@@ -210,7 +210,7 @@ func TestPingWireErrors(t *testing.T) {
 	}{
 		// Latest protocol version with intentional read/write errors.
 		{
-			&btcwire.MsgPing{Nonce: 123123}, // 0x1e0f3
+			&rddwire.MsgPing{Nonce: 123123}, // 0x1e0f3
 			[]byte{0xf3, 0xe0, 0x01, 0x00},
 			pver,
 			2,
@@ -231,7 +231,7 @@ func TestPingWireErrors(t *testing.T) {
 		}
 
 		// Decode from wire format.
-		var msg btcwire.MsgPing
+		var msg rddwire.MsgPing
 		r := newFixedReader(test.max, test.buf)
 		err = msg.BtcDecode(r, test.pver)
 		if err != test.readErr {

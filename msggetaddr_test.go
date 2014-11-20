@@ -2,24 +2,24 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
 	"reflect"
 	"testing"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestGetAddr tests the MsgGetAddr API.
 func TestGetAddr(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
 	// Ensure the command is expected value.
 	wantCmd := "getaddr"
-	msg := btcwire.NewMsgGetAddr()
+	msg := rddwire.NewMsgGetAddr()
 	if cmd := msg.Command(); cmd != wantCmd {
 		t.Errorf("NewMsgGetAddr: wrong command - got %v want %v",
 			cmd, wantCmd)
@@ -41,12 +41,12 @@ func TestGetAddr(t *testing.T) {
 // TestGetAddrWire tests the MsgGetAddr wire encode and decode for various
 // protocol versions.
 func TestGetAddrWire(t *testing.T) {
-	msgGetAddr := btcwire.NewMsgGetAddr()
+	msgGetAddr := rddwire.NewMsgGetAddr()
 	msgGetAddrEncoded := []byte{}
 
 	tests := []struct {
-		in   *btcwire.MsgGetAddr // Message to encode
-		out  *btcwire.MsgGetAddr // Expected decoded message
+		in   *rddwire.MsgGetAddr // Message to encode
+		out  *rddwire.MsgGetAddr // Expected decoded message
 		buf  []byte              // Wire encoding
 		pver uint32              // Protocol version for wire encoding
 	}{
@@ -55,7 +55,7 @@ func TestGetAddrWire(t *testing.T) {
 			msgGetAddr,
 			msgGetAddr,
 			msgGetAddrEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version BIP0035Version.
@@ -63,7 +63,7 @@ func TestGetAddrWire(t *testing.T) {
 			msgGetAddr,
 			msgGetAddr,
 			msgGetAddrEncoded,
-			btcwire.BIP0035Version,
+			rddwire.BIP0035Version,
 		},
 
 		// Protocol version BIP0031Version.
@@ -71,7 +71,7 @@ func TestGetAddrWire(t *testing.T) {
 			msgGetAddr,
 			msgGetAddr,
 			msgGetAddrEncoded,
-			btcwire.BIP0031Version,
+			rddwire.BIP0031Version,
 		},
 
 		// Protocol version NetAddressTimeVersion.
@@ -79,7 +79,7 @@ func TestGetAddrWire(t *testing.T) {
 			msgGetAddr,
 			msgGetAddr,
 			msgGetAddrEncoded,
-			btcwire.NetAddressTimeVersion,
+			rddwire.NetAddressTimeVersion,
 		},
 
 		// Protocol version MultipleAddressVersion.
@@ -87,7 +87,7 @@ func TestGetAddrWire(t *testing.T) {
 			msgGetAddr,
 			msgGetAddr,
 			msgGetAddrEncoded,
-			btcwire.MultipleAddressVersion,
+			rddwire.MultipleAddressVersion,
 		},
 	}
 
@@ -107,7 +107,7 @@ func TestGetAddrWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var msg btcwire.MsgGetAddr
+		var msg rddwire.MsgGetAddr
 		rbuf := bytes.NewReader(test.buf)
 		err = msg.BtcDecode(rbuf, test.pver)
 		if err != nil {

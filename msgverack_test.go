@@ -2,24 +2,24 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
 	"reflect"
 	"testing"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestVerAck tests the MsgVerAck API.
 func TestVerAck(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
 	// Ensure the command is expected value.
 	wantCmd := "verack"
-	msg := btcwire.NewMsgVerAck()
+	msg := rddwire.NewMsgVerAck()
 	if cmd := msg.Command(); cmd != wantCmd {
 		t.Errorf("NewMsgVerAck: wrong command - got %v want %v",
 			cmd, wantCmd)
@@ -40,12 +40,12 @@ func TestVerAck(t *testing.T) {
 // TestVerAckWire tests the MsgVerAck wire encode and decode for various
 // protocol versions.
 func TestVerAckWire(t *testing.T) {
-	msgVerAck := btcwire.NewMsgVerAck()
+	msgVerAck := rddwire.NewMsgVerAck()
 	msgVerAckEncoded := []byte{}
 
 	tests := []struct {
-		in   *btcwire.MsgVerAck // Message to encode
-		out  *btcwire.MsgVerAck // Expected decoded message
+		in   *rddwire.MsgVerAck // Message to encode
+		out  *rddwire.MsgVerAck // Expected decoded message
 		buf  []byte             // Wire encoding
 		pver uint32             // Protocol version for wire encoding
 	}{
@@ -54,7 +54,7 @@ func TestVerAckWire(t *testing.T) {
 			msgVerAck,
 			msgVerAck,
 			msgVerAckEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version BIP0035Version.
@@ -62,7 +62,7 @@ func TestVerAckWire(t *testing.T) {
 			msgVerAck,
 			msgVerAck,
 			msgVerAckEncoded,
-			btcwire.BIP0035Version,
+			rddwire.BIP0035Version,
 		},
 
 		// Protocol version BIP0031Version.
@@ -70,7 +70,7 @@ func TestVerAckWire(t *testing.T) {
 			msgVerAck,
 			msgVerAck,
 			msgVerAckEncoded,
-			btcwire.BIP0031Version,
+			rddwire.BIP0031Version,
 		},
 
 		// Protocol version NetAddressTimeVersion.
@@ -78,7 +78,7 @@ func TestVerAckWire(t *testing.T) {
 			msgVerAck,
 			msgVerAck,
 			msgVerAckEncoded,
-			btcwire.NetAddressTimeVersion,
+			rddwire.NetAddressTimeVersion,
 		},
 
 		// Protocol version MultipleAddressVersion.
@@ -86,7 +86,7 @@ func TestVerAckWire(t *testing.T) {
 			msgVerAck,
 			msgVerAck,
 			msgVerAckEncoded,
-			btcwire.MultipleAddressVersion,
+			rddwire.MultipleAddressVersion,
 		},
 	}
 
@@ -106,7 +106,7 @@ func TestVerAckWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var msg btcwire.MsgVerAck
+		var msg rddwire.MsgVerAck
 		rbuf := bytes.NewReader(test.buf)
 		err = msg.BtcDecode(rbuf, test.pver)
 		if err != nil {

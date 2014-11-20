@@ -2,7 +2,7 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
@@ -10,13 +10,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestBlockHeader tests the BlockHeader API.
 func TestBlockHeader(t *testing.T) {
-	nonce64, err := btcwire.RandomUint64()
+	nonce64, err := rddwire.RandomUint64()
 	if err != nil {
 		t.Errorf("RandomUint64: Error generating nonce: %v", err)
 	}
@@ -25,7 +25,7 @@ func TestBlockHeader(t *testing.T) {
 	hash := mainNetGenesisHash
 	merkleHash := mainNetGenesisMerkleRoot
 	bits := uint32(0x1d00ffff)
-	bh := btcwire.NewBlockHeader(&hash, &merkleHash, bits, nonce)
+	bh := rddwire.NewBlockHeader(&hash, &merkleHash, bits, nonce)
 
 	// Ensure we get the same data back out.
 	if !bh.PrevBlock.IsEqual(&hash) {
@@ -53,7 +53,7 @@ func TestBlockHeaderWire(t *testing.T) {
 
 	// baseBlockHdr is used in the various tests as a baseline BlockHeader.
 	bits := uint32(0x1d00ffff)
-	baseBlockHdr := &btcwire.BlockHeader{
+	baseBlockHdr := &rddwire.BlockHeader{
 		Version:    1,
 		PrevBlock:  mainNetGenesisHash,
 		MerkleRoot: mainNetGenesisMerkleRoot,
@@ -79,8 +79,8 @@ func TestBlockHeaderWire(t *testing.T) {
 	}
 
 	tests := []struct {
-		in   *btcwire.BlockHeader // Data to encode
-		out  *btcwire.BlockHeader // Expected decoded data
+		in   *rddwire.BlockHeader // Data to encode
+		out  *rddwire.BlockHeader // Expected decoded data
 		buf  []byte               // Wire encoding
 		pver uint32               // Protocol version for wire encoding
 	}{
@@ -89,7 +89,7 @@ func TestBlockHeaderWire(t *testing.T) {
 			baseBlockHdr,
 			baseBlockHdr,
 			baseBlockHdrEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version BIP0035Version.
@@ -97,7 +97,7 @@ func TestBlockHeaderWire(t *testing.T) {
 			baseBlockHdr,
 			baseBlockHdr,
 			baseBlockHdrEncoded,
-			btcwire.BIP0035Version,
+			rddwire.BIP0035Version,
 		},
 
 		// Protocol version BIP0031Version.
@@ -105,7 +105,7 @@ func TestBlockHeaderWire(t *testing.T) {
 			baseBlockHdr,
 			baseBlockHdr,
 			baseBlockHdrEncoded,
-			btcwire.BIP0031Version,
+			rddwire.BIP0031Version,
 		},
 
 		// Protocol version NetAddressTimeVersion.
@@ -113,7 +113,7 @@ func TestBlockHeaderWire(t *testing.T) {
 			baseBlockHdr,
 			baseBlockHdr,
 			baseBlockHdrEncoded,
-			btcwire.NetAddressTimeVersion,
+			rddwire.NetAddressTimeVersion,
 		},
 
 		// Protocol version MultipleAddressVersion.
@@ -121,7 +121,7 @@ func TestBlockHeaderWire(t *testing.T) {
 			baseBlockHdr,
 			baseBlockHdr,
 			baseBlockHdrEncoded,
-			btcwire.MultipleAddressVersion,
+			rddwire.MultipleAddressVersion,
 		},
 	}
 
@@ -129,7 +129,7 @@ func TestBlockHeaderWire(t *testing.T) {
 	for i, test := range tests {
 		// Encode to wire format.
 		var buf bytes.Buffer
-		err := btcwire.TstWriteBlockHeader(&buf, test.pver, test.in)
+		err := rddwire.TstWriteBlockHeader(&buf, test.pver, test.in)
 		if err != nil {
 			t.Errorf("writeBlockHeader #%d error %v", i, err)
 			continue
@@ -141,9 +141,9 @@ func TestBlockHeaderWire(t *testing.T) {
 		}
 
 		// Decode the block header from wire format.
-		var bh btcwire.BlockHeader
+		var bh rddwire.BlockHeader
 		rbuf := bytes.NewReader(test.buf)
-		err = btcwire.TstReadBlockHeader(rbuf, test.pver, &bh)
+		err = rddwire.TstReadBlockHeader(rbuf, test.pver, &bh)
 		if err != nil {
 			t.Errorf("readBlockHeader #%d error %v", i, err)
 			continue
@@ -162,7 +162,7 @@ func TestBlockHeaderSerialize(t *testing.T) {
 
 	// baseBlockHdr is used in the various tests as a baseline BlockHeader.
 	bits := uint32(0x1d00ffff)
-	baseBlockHdr := &btcwire.BlockHeader{
+	baseBlockHdr := &rddwire.BlockHeader{
 		Version:    1,
 		PrevBlock:  mainNetGenesisHash,
 		MerkleRoot: mainNetGenesisMerkleRoot,
@@ -188,8 +188,8 @@ func TestBlockHeaderSerialize(t *testing.T) {
 	}
 
 	tests := []struct {
-		in  *btcwire.BlockHeader // Data to encode
-		out *btcwire.BlockHeader // Expected decoded data
+		in  *rddwire.BlockHeader // Data to encode
+		out *rddwire.BlockHeader // Expected decoded data
 		buf []byte               // Serialized data
 	}{
 		{
@@ -215,7 +215,7 @@ func TestBlockHeaderSerialize(t *testing.T) {
 		}
 
 		// Deserialize the block header.
-		var bh btcwire.BlockHeader
+		var bh rddwire.BlockHeader
 		rbuf := bytes.NewReader(test.buf)
 		err = bh.Deserialize(rbuf)
 		if err != nil {

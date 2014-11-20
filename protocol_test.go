@@ -2,22 +2,22 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"testing"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 )
 
 // TestServiceFlagStringer tests the stringized output for service flag types.
 func TestServiceFlagStringer(t *testing.T) {
 	tests := []struct {
-		in   btcwire.ServiceFlag
+		in   rddwire.ServiceFlag
 		want string
 	}{
 		{0, "0x0"},
-		{btcwire.SFNodeNetwork, "SFNodeNetwork"},
+		{rddwire.SFNodeNetwork, "SFNodeNetwork"},
 		{0xffffffff, "SFNodeNetwork|0xfffffffe"},
 	}
 
@@ -35,13 +35,13 @@ func TestServiceFlagStringer(t *testing.T) {
 // TestBitcoinNetStringer tests the stringized output for bitcoin net types.
 func TestBitcoinNetStringer(t *testing.T) {
 	tests := []struct {
-		in   btcwire.BitcoinNet
+		in   rddwire.BitcoinNet
 		want string
 	}{
-		{btcwire.MainNet, "MainNet"},
-		{btcwire.TestNet, "TestNet"},
-		{btcwire.TestNet3, "TestNet3"},
-		{btcwire.SimNet, "SimNet"},
+		{rddwire.MainNet, "MainNet"},
+		{rddwire.TestNet, "TestNet"},
+		{rddwire.TestNet3, "TestNet3"},
+		{rddwire.SimNet, "SimNet"},
 		{0xffffffff, "Unknown BitcoinNet (4294967295)"},
 	}
 

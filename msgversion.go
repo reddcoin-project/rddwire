@@ -2,7 +2,7 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire
+package rddwire
 
 import (
 	"bytes"
@@ -17,8 +17,8 @@ import (
 // version message (MsgVersion).
 const MaxUserAgentLen = 2000
 
-// DefaultUserAgent for btcwire in the stack
-const DefaultUserAgent = "/btcwire:0.2.0/"
+// DefaultUserAgent for rddwire in the stack
+const DefaultUserAgent = "/rddwire:0.2.0/"
 
 // MsgVersion implements the Message interface and represents a bitcoin version
 // message.  It is used for a peer to advertise itself as soon as an outbound

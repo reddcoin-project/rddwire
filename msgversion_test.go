@@ -2,7 +2,7 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
@@ -13,33 +13,33 @@ import (
 	"testing"
 	"time"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestVersion tests the MsgVersion API.
 func TestVersion(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
 	// Create version message data.
 	lastBlock := int32(234234)
 	tcpAddrMe := &net.TCPAddr{IP: net.ParseIP("127.0.0.1"), Port: 8333}
-	me, err := btcwire.NewNetAddress(tcpAddrMe, btcwire.SFNodeNetwork)
+	me, err := rddwire.NewNetAddress(tcpAddrMe, rddwire.SFNodeNetwork)
 	if err != nil {
 		t.Errorf("NewNetAddress: %v", err)
 	}
 	tcpAddrYou := &net.TCPAddr{IP: net.ParseIP("192.168.0.1"), Port: 8333}
-	you, err := btcwire.NewNetAddress(tcpAddrYou, btcwire.SFNodeNetwork)
+	you, err := rddwire.NewNetAddress(tcpAddrYou, rddwire.SFNodeNetwork)
 	if err != nil {
 		t.Errorf("NewNetAddress: %v", err)
 	}
-	nonce, err := btcwire.RandomUint64()
+	nonce, err := rddwire.RandomUint64()
 	if err != nil {
 		t.Errorf("RandomUint64: error generating nonce: %v", err)
 	}
 
 	// Ensure we get the correct data back out.
-	msg := btcwire.NewMsgVersion(me, you, nonce, lastBlock)
+	msg := rddwire.NewMsgVersion(me, you, nonce, lastBlock)
 	if msg.ProtocolVersion != int32(pver) {
 		t.Errorf("NewMsgVersion: wrong protocol version - got %v, want %v",
 			msg.ProtocolVersion, pver)
@@ -56,9 +56,9 @@ func TestVersion(t *testing.T) {
 		t.Errorf("NewMsgVersion: wrong nonce - got %v, want %v",
 			msg.Nonce, nonce)
 	}
-	if msg.UserAgent != btcwire.DefaultUserAgent {
+	if msg.UserAgent != rddwire.DefaultUserAgent {
 		t.Errorf("NewMsgVersion: wrong user agent - got %v, want %v",
-			msg.UserAgent, btcwire.DefaultUserAgent)
+			msg.UserAgent, rddwire.DefaultUserAgent)
 	}
 	if msg.LastBlock != lastBlock {
 		t.Errorf("NewMsgVersion: wrong last block - got %v, want %v",
@@ -70,7 +70,7 @@ func TestVersion(t *testing.T) {
 	}
 
 	msg.AddUserAgent("myclient", "1.2.3", "optional", "comments")
-	customUserAgent := btcwire.DefaultUserAgent + "myclient:1.2.3(optional; comments)/"
+	customUserAgent := rddwire.DefaultUserAgent + "myclient:1.2.3(optional; comments)/"
 	if msg.UserAgent != customUserAgent {
 		t.Errorf("AddUserAgent: wrong user agent - got %s, want %s",
 			msg.UserAgent, customUserAgent)
@@ -85,10 +85,10 @@ func TestVersion(t *testing.T) {
 
 	// accounting for ":", "/"
 	err = msg.AddUserAgent(strings.Repeat("t",
-		btcwire.MaxUserAgentLen-len(customUserAgent)-2+1), "")
-	if _, ok := err.(*btcwire.MessageError); !ok {
+		rddwire.MaxUserAgentLen-len(customUserAgent)-2+1), "")
+	if _, ok := err.(*rddwire.MessageError); !ok {
 		t.Errorf("AddUserAgent: expected error not received "+
-			"- got %v, want %T", err, btcwire.MessageError{})
+			"- got %v, want %T", err, rddwire.MessageError{})
 
 	}
 
@@ -98,7 +98,7 @@ func TestVersion(t *testing.T) {
 			msg.Services, 0)
 
 	}
-	if msg.HasService(btcwire.SFNodeNetwork) {
+	if msg.HasService(rddwire.SFNodeNetwork) {
 		t.Errorf("HasService: SFNodeNetwork service is set")
 	}
 
@@ -123,18 +123,18 @@ func TestVersion(t *testing.T) {
 	}
 
 	// Ensure adding the full service node flag works.
-	msg.AddService(btcwire.SFNodeNetwork)
-	if msg.Services != btcwire.SFNodeNetwork {
+	msg.AddService(rddwire.SFNodeNetwork)
+	if msg.Services != rddwire.SFNodeNetwork {
 		t.Errorf("AddService: wrong services - got %v, want %v",
-			msg.Services, btcwire.SFNodeNetwork)
+			msg.Services, rddwire.SFNodeNetwork)
 	}
-	if !msg.HasService(btcwire.SFNodeNetwork) {
+	if !msg.HasService(rddwire.SFNodeNetwork) {
 		t.Errorf("HasService: SFNodeNetwork service not set")
 	}
 
 	// Use a fake connection.
 	conn := &fakeConn{localAddr: tcpAddrMe, remoteAddr: tcpAddrYou}
-	msg, err = btcwire.NewMsgVersionFromConn(conn, nonce, lastBlock)
+	msg, err = rddwire.NewMsgVersionFromConn(conn, nonce, lastBlock)
 	if err != nil {
 		t.Errorf("NewMsgVersionFromConn: %v", err)
 	}
@@ -154,10 +154,10 @@ func TestVersion(t *testing.T) {
 		localAddr:  &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 8333},
 		remoteAddr: tcpAddrYou,
 	}
-	msg, err = btcwire.NewMsgVersionFromConn(conn, nonce, lastBlock)
-	if err != btcwire.ErrInvalidNetAddr {
+	msg, err = rddwire.NewMsgVersionFromConn(conn, nonce, lastBlock)
+	if err != rddwire.ErrInvalidNetAddr {
 		t.Errorf("NewMsgVersionFromConn: expected error not received "+
-			"- got %v, want %v", err, btcwire.ErrInvalidNetAddr)
+			"- got %v, want %v", err, rddwire.ErrInvalidNetAddr)
 	}
 
 	// Use a fake connection with remote UDP addresses to force a failure.
@@ -165,10 +165,10 @@ func TestVersion(t *testing.T) {
 		localAddr:  tcpAddrMe,
 		remoteAddr: &net.UDPAddr{IP: net.ParseIP("192.168.0.1"), Port: 8333},
 	}
-	msg, err = btcwire.NewMsgVersionFromConn(conn, nonce, lastBlock)
-	if err != btcwire.ErrInvalidNetAddr {
+	msg, err = rddwire.NewMsgVersionFromConn(conn, nonce, lastBlock)
+	if err != rddwire.ErrInvalidNetAddr {
 		t.Errorf("NewMsgVersionFromConn: expected error not received "+
-			"- got %v, want %v", err, btcwire.ErrInvalidNetAddr)
+			"- got %v, want %v", err, rddwire.ErrInvalidNetAddr)
 	}
 
 	return
@@ -187,8 +187,8 @@ func TestVersionWire(t *testing.T) {
 	verRelayTxFalseEncoded[len(verRelayTxFalseEncoded)-1] = 0
 
 	tests := []struct {
-		in   *btcwire.MsgVersion // Message to encode
-		out  *btcwire.MsgVersion // Expected decoded message
+		in   *rddwire.MsgVersion // Message to encode
+		out  *rddwire.MsgVersion // Expected decoded message
 		buf  []byte              // Wire encoding
 		pver uint32              // Protocol version for wire encoding
 	}{
@@ -197,7 +197,7 @@ func TestVersionWire(t *testing.T) {
 			baseVersionBIP0037,
 			baseVersionBIP0037,
 			baseVersionBIP0037Encoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version BIP0037Version with relay transactions field
@@ -206,7 +206,7 @@ func TestVersionWire(t *testing.T) {
 			baseVersionBIP0037,
 			baseVersionBIP0037,
 			baseVersionBIP0037Encoded,
-			btcwire.BIP0037Version,
+			rddwire.BIP0037Version,
 		},
 
 		// Protocol version BIP0037Version with relay transactions field
@@ -215,7 +215,7 @@ func TestVersionWire(t *testing.T) {
 			verRelayTxFalse,
 			verRelayTxFalse,
 			verRelayTxFalseEncoded,
-			btcwire.BIP0037Version,
+			rddwire.BIP0037Version,
 		},
 
 		// Protocol version BIP0035Version.
@@ -223,7 +223,7 @@ func TestVersionWire(t *testing.T) {
 			baseVersion,
 			baseVersion,
 			baseVersionEncoded,
-			btcwire.BIP0035Version,
+			rddwire.BIP0035Version,
 		},
 
 		// Protocol version BIP0031Version.
@@ -231,7 +231,7 @@ func TestVersionWire(t *testing.T) {
 			baseVersion,
 			baseVersion,
 			baseVersionEncoded,
-			btcwire.BIP0031Version,
+			rddwire.BIP0031Version,
 		},
 
 		// Protocol version NetAddressTimeVersion.
@@ -239,7 +239,7 @@ func TestVersionWire(t *testing.T) {
 			baseVersion,
 			baseVersion,
 			baseVersionEncoded,
-			btcwire.NetAddressTimeVersion,
+			rddwire.NetAddressTimeVersion,
 		},
 
 		// Protocol version MultipleAddressVersion.
@@ -247,7 +247,7 @@ func TestVersionWire(t *testing.T) {
 			baseVersion,
 			baseVersion,
 			baseVersionEncoded,
-			btcwire.MultipleAddressVersion,
+			rddwire.MultipleAddressVersion,
 		},
 	}
 
@@ -267,7 +267,7 @@ func TestVersionWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var msg btcwire.MsgVersion
+		var msg rddwire.MsgVersion
 		rbuf := bytes.NewBuffer(test.buf)
 		err = msg.BtcDecode(rbuf, test.pver)
 		if err != nil {
@@ -289,7 +289,7 @@ func TestVersionWireErrors(t *testing.T) {
 	// because the test data is using bytes encoded with that protocol
 	// version.
 	pver := uint32(60002)
-	btcwireErr := &btcwire.MessageError{}
+	rddwireErr := &rddwire.MessageError{}
 
 	// Ensure calling MsgVersion.BtcDecode with a non *bytes.Buffer returns
 	// error.
@@ -302,12 +302,12 @@ func TestVersionWireErrors(t *testing.T) {
 	// Copy the base version and change the user agent to exceed max limits.
 	bvc := *baseVersion
 	exceedUAVer := &bvc
-	newUA := "/" + strings.Repeat("t", btcwire.MaxUserAgentLen-8+1) + ":0.0.1/"
+	newUA := "/" + strings.Repeat("t", rddwire.MaxUserAgentLen-8+1) + ":0.0.1/"
 	exceedUAVer.UserAgent = newUA
 
 	// Encode the new UA length as a varint.
 	var newUAVarIntBuf bytes.Buffer
-	err := btcwire.TstWriteVarInt(&newUAVarIntBuf, pver, uint64(len(newUA)))
+	err := rddwire.TstWriteVarInt(&newUAVarIntBuf, pver, uint64(len(newUA)))
 	if err != nil {
 		t.Errorf("writeVarInt: error %v", err)
 	}
@@ -324,7 +324,7 @@ func TestVersionWireErrors(t *testing.T) {
 	copy(exceedUAVerEncoded[83+len(newUA):], baseVersionEncoded[97:100])
 
 	tests := []struct {
-		in       *btcwire.MsgVersion // Value to encode
+		in       *rddwire.MsgVersion // Value to encode
 		buf      []byte              // Wire encoding
 		pver     uint32              // Protocol version for wire encoding
 		max      int                 // Max size of fixed buffer to induce errors
@@ -353,10 +353,10 @@ func TestVersionWireErrors(t *testing.T) {
 		// it's optional.
 		{
 			baseVersionBIP0037, baseVersionBIP0037Encoded,
-			btcwire.BIP0037Version, 101, io.ErrShortWrite, nil,
+			rddwire.BIP0037Version, 101, io.ErrShortWrite, nil,
 		},
 		// Force error due to user agent too big
-		{exceedUAVer, exceedUAVerEncoded, pver, newLen, btcwireErr, btcwireErr},
+		{exceedUAVer, exceedUAVerEncoded, pver, newLen, rddwireErr, rddwireErr},
 	}
 
 	t.Logf("Running %d tests", len(tests))
@@ -370,9 +370,9 @@ func TestVersionWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.writeErr {
 				t.Errorf("BtcEncode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.writeErr)
@@ -381,7 +381,7 @@ func TestVersionWireErrors(t *testing.T) {
 		}
 
 		// Decode from wire format.
-		var msg btcwire.MsgVersion
+		var msg rddwire.MsgVersion
 		buf := bytes.NewBuffer(test.buf[0:test.max])
 		err = msg.BtcDecode(buf, test.pver)
 		if reflect.TypeOf(err) != reflect.TypeOf(test.readErr) {
@@ -390,9 +390,9 @@ func TestVersionWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.readErr {
 				t.Errorf("BtcDecode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.readErr)
@@ -407,13 +407,13 @@ func TestVersionWireErrors(t *testing.T) {
 func TestVersionOptionalFields(t *testing.T) {
 	// onlyRequiredVersion is a version message that only contains the
 	// required versions and all other values set to their default values.
-	onlyRequiredVersion := btcwire.MsgVersion{
+	onlyRequiredVersion := rddwire.MsgVersion{
 		ProtocolVersion: 60002,
-		Services:        btcwire.SFNodeNetwork,
+		Services:        rddwire.SFNodeNetwork,
 		Timestamp:       time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST)
-		AddrYou: btcwire.NetAddress{
+		AddrYou: rddwire.NetAddress{
 			Timestamp: time.Time{}, // Zero value -- no timestamp in version
-			Services:  btcwire.SFNodeNetwork,
+			Services:  rddwire.SFNodeNetwork,
 			IP:        net.ParseIP("192.168.0.1"),
 			Port:      8333,
 		},
@@ -424,9 +424,9 @@ func TestVersionOptionalFields(t *testing.T) {
 	// addrMeVersion is a version message that contains all fields through
 	// the AddrMe field.
 	addrMeVersion := onlyRequiredVersion
-	addrMeVersion.AddrMe = btcwire.NetAddress{
+	addrMeVersion.AddrMe = rddwire.NetAddress{
 		Timestamp: time.Time{}, // Zero value -- no timestamp in version
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("127.0.0.1"),
 		Port:      8333,
 	}
@@ -455,40 +455,40 @@ func TestVersionOptionalFields(t *testing.T) {
 	copy(lastBlockVersionEncoded, baseVersionEncoded)
 
 	tests := []struct {
-		msg  *btcwire.MsgVersion // Expected message
+		msg  *rddwire.MsgVersion // Expected message
 		buf  []byte              // Wire encoding
 		pver uint32              // Protocol version for wire encoding
 	}{
 		{
 			&onlyRequiredVersion,
 			onlyRequiredVersionEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 		{
 			&addrMeVersion,
 			addrMeVersionEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 		{
 			&nonceVersion,
 			nonceVersionEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 		{
 			&uaVersion,
 			uaVersionEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 		{
 			&lastBlockVersion,
 			lastBlockVersionEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 	}
 
 	for i, test := range tests {
 		// Decode the message from wire format.
-		var msg btcwire.MsgVersion
+		var msg rddwire.MsgVersion
 		rbuf := bytes.NewBuffer(test.buf)
 		err := msg.BtcDecode(rbuf, test.pver)
 		if err != nil {
@@ -504,19 +504,19 @@ func TestVersionOptionalFields(t *testing.T) {
 }
 
 // baseVersion is used in the various tests as a baseline MsgVersion.
-var baseVersion = &btcwire.MsgVersion{
+var baseVersion = &rddwire.MsgVersion{
 	ProtocolVersion: 60002,
-	Services:        btcwire.SFNodeNetwork,
+	Services:        rddwire.SFNodeNetwork,
 	Timestamp:       time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST)
-	AddrYou: btcwire.NetAddress{
+	AddrYou: rddwire.NetAddress{
 		Timestamp: time.Time{}, // Zero value -- no timestamp in version
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("192.168.0.1"),
 		Port:      8333,
 	},
-	AddrMe: btcwire.NetAddress{
+	AddrMe: rddwire.NetAddress{
 		Timestamp: time.Time{}, // Zero value -- no timestamp in version
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("127.0.0.1"),
 		Port:      8333,
 	},
@@ -550,19 +550,19 @@ var baseVersionEncoded = []byte{
 
 // baseVersionBIP0037 is used in the various tests as a baseline MsgVersion for
 // BIP0037.
-var baseVersionBIP0037 = &btcwire.MsgVersion{
+var baseVersionBIP0037 = &rddwire.MsgVersion{
 	ProtocolVersion: 70001,
-	Services:        btcwire.SFNodeNetwork,
+	Services:        rddwire.SFNodeNetwork,
 	Timestamp:       time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST)
-	AddrYou: btcwire.NetAddress{
+	AddrYou: rddwire.NetAddress{
 		Timestamp: time.Time{}, // Zero value -- no timestamp in version
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("192.168.0.1"),
 		Port:      8333,
 	},
-	AddrMe: btcwire.NetAddress{
+	AddrMe: rddwire.NetAddress{
 		Timestamp: time.Time{}, // Zero value -- no timestamp in version
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("127.0.0.1"),
 		Port:      8333,
 	},

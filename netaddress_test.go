@@ -2,7 +2,7 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -26,7 +26,7 @@ func TestNetAddress(t *testing.T) {
 		IP:   ip,
 		Port: port,
 	}
-	na, err := btcwire.NewNetAddress(tcpAddr, 0)
+	na, err := rddwire.NewNetAddress(tcpAddr, 0)
 	if err != nil {
 		t.Errorf("NewNetAddress: %v", err)
 	}
@@ -43,24 +43,24 @@ func TestNetAddress(t *testing.T) {
 		t.Errorf("NetNetAddress: wrong services - got %v, want %v",
 			na.Services, 0)
 	}
-	if na.HasService(btcwire.SFNodeNetwork) {
+	if na.HasService(rddwire.SFNodeNetwork) {
 		t.Errorf("HasService: SFNodeNetwork service is set")
 	}
 
 	// Ensure adding the full service node flag works.
-	na.AddService(btcwire.SFNodeNetwork)
-	if na.Services != btcwire.SFNodeNetwork {
+	na.AddService(rddwire.SFNodeNetwork)
+	if na.Services != rddwire.SFNodeNetwork {
 		t.Errorf("AddService: wrong services - got %v, want %v",
-			na.Services, btcwire.SFNodeNetwork)
+			na.Services, rddwire.SFNodeNetwork)
 	}
-	if !na.HasService(btcwire.SFNodeNetwork) {
+	if !na.HasService(rddwire.SFNodeNetwork) {
 		t.Errorf("HasService: SFNodeNetwork service not set")
 	}
 
 	// Ensure max payload is expected value for latest protocol version.
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 	wantPayload := uint32(30)
-	maxPayload := btcwire.TstMaxNetAddressPayload(btcwire.ProtocolVersion)
+	maxPayload := rddwire.TstMaxNetAddressPayload(rddwire.ProtocolVersion)
 	if maxPayload != wantPayload {
 		t.Errorf("maxNetAddressPayload: wrong max payload length for "+
 			"protocol version %d - got %v, want %v", pver,
@@ -69,9 +69,9 @@ func TestNetAddress(t *testing.T) {
 
 	// Protocol version before NetAddressTimeVersion when timestamp was
 	// added.  Ensure max payload is expected value for it.
-	pver = btcwire.NetAddressTimeVersion - 1
+	pver = rddwire.NetAddressTimeVersion - 1
 	wantPayload = 26
-	maxPayload = btcwire.TstMaxNetAddressPayload(pver)
+	maxPayload = rddwire.TstMaxNetAddressPayload(pver)
 	if maxPayload != wantPayload {
 		t.Errorf("maxNetAddressPayload: wrong max payload length for "+
 			"protocol version %d - got %v, want %v", pver,
@@ -80,10 +80,10 @@ func TestNetAddress(t *testing.T) {
 
 	// Check for expected failure on wrong address type.
 	udpAddr := &net.UDPAddr{}
-	_, err = btcwire.NewNetAddress(udpAddr, 0)
-	if err != btcwire.ErrInvalidNetAddr {
+	_, err = rddwire.NewNetAddress(udpAddr, 0)
+	if err != rddwire.ErrInvalidNetAddr {
 		t.Errorf("NewNetAddress: expected error not received - "+
-			"got %v, want %v", err, btcwire.ErrInvalidNetAddr)
+			"got %v, want %v", err, rddwire.ErrInvalidNetAddr)
 	}
 }
 
@@ -91,9 +91,9 @@ func TestNetAddress(t *testing.T) {
 // protocol versions and timestamp flag combinations.
 func TestNetAddressWire(t *testing.T) {
 	// baseNetAddr is used in the various tests as a baseline NetAddress.
-	baseNetAddr := btcwire.NetAddress{
+	baseNetAddr := rddwire.NetAddress{
 		Timestamp: time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("127.0.0.1"),
 		Port:      8333,
 	}
@@ -121,8 +121,8 @@ func TestNetAddressWire(t *testing.T) {
 	}
 
 	tests := []struct {
-		in   btcwire.NetAddress // NetAddress to encode
-		out  btcwire.NetAddress // Expected decoded NetAddress
+		in   rddwire.NetAddress // NetAddress to encode
+		out  rddwire.NetAddress // Expected decoded NetAddress
 		ts   bool               // Include timestamp?
 		buf  []byte             // Wire encoding
 		pver uint32             // Protocol version for wire encoding
@@ -133,7 +133,7 @@ func TestNetAddressWire(t *testing.T) {
 			baseNetAddrNoTS,
 			false,
 			baseNetAddrNoTSEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Latest protocol version with ts flag.
@@ -142,7 +142,7 @@ func TestNetAddressWire(t *testing.T) {
 			baseNetAddr,
 			true,
 			baseNetAddrEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version NetAddressTimeVersion without ts flag.
@@ -151,7 +151,7 @@ func TestNetAddressWire(t *testing.T) {
 			baseNetAddrNoTS,
 			false,
 			baseNetAddrNoTSEncoded,
-			btcwire.NetAddressTimeVersion,
+			rddwire.NetAddressTimeVersion,
 		},
 
 		// Protocol version NetAddressTimeVersion with ts flag.
@@ -160,7 +160,7 @@ func TestNetAddressWire(t *testing.T) {
 			baseNetAddr,
 			true,
 			baseNetAddrEncoded,
-			btcwire.NetAddressTimeVersion,
+			rddwire.NetAddressTimeVersion,
 		},
 
 		// Protocol version NetAddressTimeVersion-1 without ts flag.
@@ -169,7 +169,7 @@ func TestNetAddressWire(t *testing.T) {
 			baseNetAddrNoTS,
 			false,
 			baseNetAddrNoTSEncoded,
-			btcwire.NetAddressTimeVersion - 1,
+			rddwire.NetAddressTimeVersion - 1,
 		},
 
 		// Protocol version NetAddressTimeVersion-1 with timestamp.
@@ -181,7 +181,7 @@ func TestNetAddressWire(t *testing.T) {
 			baseNetAddrNoTS,
 			true,
 			baseNetAddrNoTSEncoded,
-			btcwire.NetAddressTimeVersion - 1,
+			rddwire.NetAddressTimeVersion - 1,
 		},
 	}
 
@@ -189,7 +189,7 @@ func TestNetAddressWire(t *testing.T) {
 	for i, test := range tests {
 		// Encode to wire format.
 		var buf bytes.Buffer
-		err := btcwire.TstWriteNetAddress(&buf, test.pver, &test.in, test.ts)
+		err := rddwire.TstWriteNetAddress(&buf, test.pver, &test.in, test.ts)
 		if err != nil {
 			t.Errorf("writeNetAddress #%d error %v", i, err)
 			continue
@@ -201,9 +201,9 @@ func TestNetAddressWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var na btcwire.NetAddress
+		var na rddwire.NetAddress
 		rbuf := bytes.NewReader(test.buf)
-		err = btcwire.TstReadNetAddress(rbuf, test.pver, &na, test.ts)
+		err = rddwire.TstReadNetAddress(rbuf, test.pver, &na, test.ts)
 		if err != nil {
 			t.Errorf("readNetAddress #%d error %v", i, err)
 			continue
@@ -219,19 +219,19 @@ func TestNetAddressWire(t *testing.T) {
 // TestNetAddressWireErrors performs negative tests against wire encode and
 // decode NetAddress to confirm error paths work correctly.
 func TestNetAddressWireErrors(t *testing.T) {
-	pver := btcwire.ProtocolVersion
-	pverNAT := btcwire.NetAddressTimeVersion - 1
+	pver := rddwire.ProtocolVersion
+	pverNAT := rddwire.NetAddressTimeVersion - 1
 
 	// baseNetAddr is used in the various tests as a baseline NetAddress.
-	baseNetAddr := btcwire.NetAddress{
+	baseNetAddr := rddwire.NetAddress{
 		Timestamp: time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("127.0.0.1"),
 		Port:      8333,
 	}
 
 	tests := []struct {
-		in       *btcwire.NetAddress // Value to encode
+		in       *rddwire.NetAddress // Value to encode
 		buf      []byte              // Wire encoding
 		pver     uint32              // Protocol version for wire encoding
 		ts       bool                // Include timestamp flag
@@ -274,7 +274,7 @@ func TestNetAddressWireErrors(t *testing.T) {
 	for i, test := range tests {
 		// Encode to wire format.
 		w := newFixedWriter(test.max)
-		err := btcwire.TstWriteNetAddress(w, test.pver, test.in, test.ts)
+		err := rddwire.TstWriteNetAddress(w, test.pver, test.in, test.ts)
 		if err != test.writeErr {
 			t.Errorf("writeNetAddress #%d wrong error got: %v, want: %v",
 				i, err, test.writeErr)
@@ -282,9 +282,9 @@ func TestNetAddressWireErrors(t *testing.T) {
 		}
 
 		// Decode from wire format.
-		var na btcwire.NetAddress
+		var na rddwire.NetAddress
 		r := newFixedReader(test.max, test.buf)
-		err = btcwire.TstReadNetAddress(r, test.pver, &na, test.ts)
+		err = rddwire.TstReadNetAddress(r, test.pver, &na, test.ts)
 		if err != test.readErr {
 			t.Errorf("readNetAddress #%d wrong error got: %v, want: %v",
 				i, err, test.readErr)

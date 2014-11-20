@@ -2,7 +2,7 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
@@ -10,24 +10,24 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestRejectCodeStringer tests the stringized output for the reject code type.
 func TestRejectCodeStringer(t *testing.T) {
 	tests := []struct {
-		in   btcwire.RejectCode
+		in   rddwire.RejectCode
 		want string
 	}{
-		{btcwire.RejectMalformed, "REJECT_MALFORMED"},
-		{btcwire.RejectInvalid, "REJECT_INVALID"},
-		{btcwire.RejectObsolete, "REJECT_OBSOLETE"},
-		{btcwire.RejectDuplicate, "REJECT_DUPLICATE"},
-		{btcwire.RejectNonstandard, "REJECT_NONSTANDARD"},
-		{btcwire.RejectDust, "REJECT_DUST"},
-		{btcwire.RejectInsufficientFee, "REJECT_INSUFFICIENTFEE"},
-		{btcwire.RejectCheckpoint, "REJECT_CHECKPOINT"},
+		{rddwire.RejectMalformed, "REJECT_MALFORMED"},
+		{rddwire.RejectInvalid, "REJECT_INVALID"},
+		{rddwire.RejectObsolete, "REJECT_OBSOLETE"},
+		{rddwire.RejectDuplicate, "REJECT_DUPLICATE"},
+		{rddwire.RejectNonstandard, "REJECT_NONSTANDARD"},
+		{rddwire.RejectDust, "REJECT_DUST"},
+		{rddwire.RejectInsufficientFee, "REJECT_INSUFFICIENTFEE"},
+		{rddwire.RejectCheckpoint, "REJECT_CHECKPOINT"},
 		{0xff, "Unknown RejectCode (255)"},
 	}
 
@@ -45,16 +45,16 @@ func TestRejectCodeStringer(t *testing.T) {
 
 // TestRejectLatest tests the MsgPong API against the latest protocol version.
 func TestRejectLatest(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
 	// Create reject message data.
-	rejCommand := (&btcwire.MsgBlock{}).Command()
-	rejCode := btcwire.RejectDuplicate
+	rejCommand := (&rddwire.MsgBlock{}).Command()
+	rejCode := rddwire.RejectDuplicate
 	rejReason := "duplicate block"
 	rejHash := mainNetGenesisHash
 
 	// Ensure we get the correct data back out.
-	msg := btcwire.NewMsgReject(rejCommand, rejCode, rejReason)
+	msg := rddwire.NewMsgReject(rejCommand, rejCode, rejReason)
 	msg.Hash = rejHash
 	if msg.Cmd != rejCommand {
 		t.Errorf("NewMsgReject: wrong rejected command - got %v, "+
@@ -77,7 +77,7 @@ func TestRejectLatest(t *testing.T) {
 	}
 
 	// Ensure max payload is expected value for latest protocol version.
-	wantPayload := uint32(btcwire.MaxMessagePayload)
+	wantPayload := uint32(rddwire.MaxMessagePayload)
 	maxPayload := msg.MaxPayloadLength(pver)
 	if maxPayload != wantPayload {
 		t.Errorf("MaxPayloadLength: wrong max payload length for "+
@@ -93,7 +93,7 @@ func TestRejectLatest(t *testing.T) {
 	}
 
 	// Test decode with latest protocol version.
-	readMsg := btcwire.MsgReject{}
+	readMsg := rddwire.MsgReject{}
 	err = readMsg.BtcDecode(&buf, pver)
 	if err != nil {
 		t.Errorf("decode of MsgReject failed %v err <%v>", buf.Bytes(),
@@ -123,15 +123,15 @@ func TestRejectLatest(t *testing.T) {
 // before the version which introduced it (RejectVersion).
 func TestRejectBeforeAdded(t *testing.T) {
 	// Use the protocol version just prior to RejectVersion.
-	pver := btcwire.RejectVersion - 1
+	pver := rddwire.RejectVersion - 1
 
 	// Create reject message data.
-	rejCommand := (&btcwire.MsgBlock{}).Command()
-	rejCode := btcwire.RejectDuplicate
+	rejCommand := (&rddwire.MsgBlock{}).Command()
+	rejCode := rddwire.RejectDuplicate
 	rejReason := "duplicate block"
 	rejHash := mainNetGenesisHash
 
-	msg := btcwire.NewMsgReject(rejCommand, rejCode, rejReason)
+	msg := rddwire.NewMsgReject(rejCommand, rejCode, rejReason)
 	msg.Hash = rejHash
 
 	// Ensure max payload is expected value for old protocol version.
@@ -150,7 +150,7 @@ func TestRejectBeforeAdded(t *testing.T) {
 	}
 
 	//	// Test decode with old protocol version.
-	readMsg := btcwire.MsgReject{}
+	readMsg := rddwire.MsgReject{}
 	err = readMsg.BtcDecode(&buf, pver)
 	if err == nil {
 		t.Errorf("decode of MsgReject succeeded when it shouldn't "+
@@ -182,24 +182,24 @@ func TestRejectBeforeAdded(t *testing.T) {
 // introduced it (RejectVersion).
 func TestRejectCrossProtocol(t *testing.T) {
 	// Create reject message data.
-	rejCommand := (&btcwire.MsgBlock{}).Command()
-	rejCode := btcwire.RejectDuplicate
+	rejCommand := (&rddwire.MsgBlock{}).Command()
+	rejCode := rddwire.RejectDuplicate
 	rejReason := "duplicate block"
 	rejHash := mainNetGenesisHash
 
-	msg := btcwire.NewMsgReject(rejCommand, rejCode, rejReason)
+	msg := rddwire.NewMsgReject(rejCommand, rejCode, rejReason)
 	msg.Hash = rejHash
 
 	// Encode with latest protocol version.
 	var buf bytes.Buffer
-	err := msg.BtcEncode(&buf, btcwire.ProtocolVersion)
+	err := msg.BtcEncode(&buf, rddwire.ProtocolVersion)
 	if err != nil {
 		t.Errorf("encode of MsgReject failed %v err <%v>", msg, err)
 	}
 
 	// Decode with old protocol version.
-	readMsg := btcwire.MsgReject{}
-	err = readMsg.BtcDecode(&buf, btcwire.RejectVersion-1)
+	readMsg := rddwire.MsgReject{}
+	err = readMsg.BtcDecode(&buf, rddwire.RejectVersion-1)
 	if err == nil {
 		t.Errorf("encode of MsgReject succeeded when it shouldn't "+
 			"have %v", msg)
@@ -226,37 +226,37 @@ func TestRejectCrossProtocol(t *testing.T) {
 // protocol versions.
 func TestRejectWire(t *testing.T) {
 	tests := []struct {
-		msg  btcwire.MsgReject // Message to encode
+		msg  rddwire.MsgReject // Message to encode
 		buf  []byte            // Wire encoding
 		pver uint32            // Protocol version for wire encoding
 	}{
 		// Latest protocol version rejected command version (no hash).
 		{
-			btcwire.MsgReject{
+			rddwire.MsgReject{
 				Cmd:    "version",
-				Code:   btcwire.RejectDuplicate,
+				Code:   rddwire.RejectDuplicate,
 				Reason: "duplicate version",
 			},
 			[]byte{
 				0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, // "version"
-				0x12, // btcwire.RejectDuplicate
+				0x12, // rddwire.RejectDuplicate
 				0x11, 0x64, 0x75, 0x70, 0x6c, 0x69, 0x63, 0x61,
 				0x74, 0x65, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69,
 				0x6f, 0x6e, // "duplicate version"
 			},
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 		// Latest protocol version rejected command block (has hash).
 		{
-			btcwire.MsgReject{
+			rddwire.MsgReject{
 				Cmd:    "block",
-				Code:   btcwire.RejectDuplicate,
+				Code:   rddwire.RejectDuplicate,
 				Reason: "duplicate block",
 				Hash:   mainNetGenesisHash,
 			},
 			[]byte{
 				0x05, 0x62, 0x6c, 0x6f, 0x63, 0x6b, // "block"
-				0x12, // btcwire.RejectDuplicate
+				0x12, // rddwire.RejectDuplicate
 				0x0f, 0x64, 0x75, 0x70, 0x6c, 0x69, 0x63, 0x61,
 				0x74, 0x65, 0x20, 0x62, 0x6c, 0x6f, 0x63, 0x6b, // "duplicate block"
 				0x6f, 0xe2, 0x8c, 0x0a, 0xb6, 0xf1, 0xb3, 0x72,
@@ -264,7 +264,7 @@ func TestRejectWire(t *testing.T) {
 				0x93, 0x1e, 0x83, 0x65, 0xe1, 0x5a, 0x08, 0x9c,
 				0x68, 0xd6, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, // mainNetGenesisHash
 			},
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 	}
 
@@ -284,7 +284,7 @@ func TestRejectWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var msg btcwire.MsgReject
+		var msg rddwire.MsgReject
 		rbuf := bytes.NewReader(test.buf)
 		err = msg.BtcDecode(rbuf, test.pver)
 		if err != nil {
@@ -302,16 +302,16 @@ func TestRejectWire(t *testing.T) {
 // TestRejectWireErrors performs negative tests against wire encode and decode
 // of MsgReject to confirm error paths work correctly.
 func TestRejectWireErrors(t *testing.T) {
-	pver := btcwire.ProtocolVersion
-	pverNoReject := btcwire.RejectVersion - 1
-	btcwireErr := &btcwire.MessageError{}
+	pver := rddwire.ProtocolVersion
+	pverNoReject := rddwire.RejectVersion - 1
+	rddwireErr := &rddwire.MessageError{}
 
-	baseReject := btcwire.NewMsgReject("block", btcwire.RejectDuplicate,
+	baseReject := rddwire.NewMsgReject("block", rddwire.RejectDuplicate,
 		"duplicate block")
 	baseReject.Hash = mainNetGenesisHash
 	baseRejectEncoded := []byte{
 		0x05, 0x62, 0x6c, 0x6f, 0x63, 0x6b, // "block"
-		0x12, // btcwire.RejectDuplicate
+		0x12, // rddwire.RejectDuplicate
 		0x0f, 0x64, 0x75, 0x70, 0x6c, 0x69, 0x63, 0x61,
 		0x74, 0x65, 0x20, 0x62, 0x6c, 0x6f, 0x63, 0x6b, // "duplicate block"
 		0x6f, 0xe2, 0x8c, 0x0a, 0xb6, 0xf1, 0xb3, 0x72,
@@ -321,7 +321,7 @@ func TestRejectWireErrors(t *testing.T) {
 	}
 
 	tests := []struct {
-		in       *btcwire.MsgReject // Value to encode
+		in       *rddwire.MsgReject // Value to encode
 		buf      []byte             // Wire encoding
 		pver     uint32             // Protocol version for wire encoding
 		max      int                // Max size of fixed buffer to induce errors
@@ -338,7 +338,7 @@ func TestRejectWireErrors(t *testing.T) {
 		// Force error in reject hash.
 		{baseReject, baseRejectEncoded, pver, 23, io.ErrShortWrite, io.EOF},
 		// Force error due to unsupported protocol version.
-		{baseReject, baseRejectEncoded, pverNoReject, 6, btcwireErr, btcwireErr},
+		{baseReject, baseRejectEncoded, pverNoReject, 6, rddwireErr, rddwireErr},
 	}
 
 	t.Logf("Running %d tests", len(tests))
@@ -352,9 +352,9 @@ func TestRejectWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.writeErr {
 				t.Errorf("BtcEncode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.writeErr)
@@ -363,7 +363,7 @@ func TestRejectWireErrors(t *testing.T) {
 		}
 
 		// Decode from wire format.
-		var msg btcwire.MsgReject
+		var msg rddwire.MsgReject
 		r := newFixedReader(test.max, test.buf)
 		err = msg.BtcDecode(r, test.pver)
 		if reflect.TypeOf(err) != reflect.TypeOf(test.readErr) {
@@ -372,9 +372,9 @@ func TestRejectWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.readErr {
 				t.Errorf("BtcDecode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.readErr)

@@ -2,23 +2,23 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
 	"reflect"
 	"testing"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestFilterCLearLatest tests the MsgFilterClear API against the latest
 // protocol version.
 func TestFilterClearLatest(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
-	msg := btcwire.NewMsgFilterClear()
+	msg := rddwire.NewMsgFilterClear()
 
 	// Ensure the command is expected value.
 	wantCmd := "filterclear"
@@ -42,18 +42,18 @@ func TestFilterClearLatest(t *testing.T) {
 // TestFilterClearCrossProtocol tests the MsgFilterClear API when encoding with
 // the latest protocol version and decoding with BIP0031Version.
 func TestFilterClearCrossProtocol(t *testing.T) {
-	msg := btcwire.NewMsgFilterClear()
+	msg := rddwire.NewMsgFilterClear()
 
 	// Encode with latest protocol version.
 	var buf bytes.Buffer
-	err := msg.BtcEncode(&buf, btcwire.ProtocolVersion)
+	err := msg.BtcEncode(&buf, rddwire.ProtocolVersion)
 	if err != nil {
 		t.Errorf("encode of MsgFilterClear failed %v err <%v>", msg, err)
 	}
 
 	// Decode with old protocol version.
-	var readmsg btcwire.MsgFilterClear
-	err = readmsg.BtcDecode(&buf, btcwire.BIP0031Version)
+	var readmsg rddwire.MsgFilterClear
+	err = readmsg.BtcDecode(&buf, rddwire.BIP0031Version)
 	if err == nil {
 		t.Errorf("decode of MsgFilterClear succeeded when it "+
 			"shouldn't have %v", msg)
@@ -63,12 +63,12 @@ func TestFilterClearCrossProtocol(t *testing.T) {
 // TestFilterClearWire tests the MsgFilterClear wire encode and decode for
 // various protocol versions.
 func TestFilterClearWire(t *testing.T) {
-	msgFilterClear := btcwire.NewMsgFilterClear()
+	msgFilterClear := rddwire.NewMsgFilterClear()
 	msgFilterClearEncoded := []byte{}
 
 	tests := []struct {
-		in   *btcwire.MsgFilterClear // Message to encode
-		out  *btcwire.MsgFilterClear // Expected decoded message
+		in   *rddwire.MsgFilterClear // Message to encode
+		out  *rddwire.MsgFilterClear // Expected decoded message
 		buf  []byte                  // Wire encoding
 		pver uint32                  // Protocol version for wire encoding
 	}{
@@ -77,7 +77,7 @@ func TestFilterClearWire(t *testing.T) {
 			msgFilterClear,
 			msgFilterClear,
 			msgFilterClearEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version BIP0037Version + 1.
@@ -85,7 +85,7 @@ func TestFilterClearWire(t *testing.T) {
 			msgFilterClear,
 			msgFilterClear,
 			msgFilterClearEncoded,
-			btcwire.BIP0037Version + 1,
+			rddwire.BIP0037Version + 1,
 		},
 
 		// Protocol version BIP0037Version.
@@ -93,7 +93,7 @@ func TestFilterClearWire(t *testing.T) {
 			msgFilterClear,
 			msgFilterClear,
 			msgFilterClearEncoded,
-			btcwire.BIP0037Version,
+			rddwire.BIP0037Version,
 		},
 	}
 
@@ -113,7 +113,7 @@ func TestFilterClearWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var msg btcwire.MsgFilterClear
+		var msg rddwire.MsgFilterClear
 		rbuf := bytes.NewReader(test.buf)
 		err = msg.BtcDecode(rbuf, test.pver)
 		if err != nil {
@@ -131,14 +131,14 @@ func TestFilterClearWire(t *testing.T) {
 // TestFilterClearWireErrors performs negative tests against wire encode and
 // decode of MsgFilterClear to confirm error paths work correctly.
 func TestFilterClearWireErrors(t *testing.T) {
-	pverNoFilterClear := btcwire.BIP0037Version - 1
-	btcwireErr := &btcwire.MessageError{}
+	pverNoFilterClear := rddwire.BIP0037Version - 1
+	rddwireErr := &rddwire.MessageError{}
 
-	baseFilterClear := btcwire.NewMsgFilterClear()
+	baseFilterClear := rddwire.NewMsgFilterClear()
 	baseFilterClearEncoded := []byte{}
 
 	tests := []struct {
-		in       *btcwire.MsgFilterClear // Value to encode
+		in       *rddwire.MsgFilterClear // Value to encode
 		buf      []byte                  // Wire encoding
 		pver     uint32                  // Protocol version for wire encoding
 		max      int                     // Max size of fixed buffer to induce errors
@@ -148,7 +148,7 @@ func TestFilterClearWireErrors(t *testing.T) {
 		// Force error due to unsupported protocol version.
 		{
 			baseFilterClear, baseFilterClearEncoded,
-			pverNoFilterClear, 4, btcwireErr, btcwireErr,
+			pverNoFilterClear, 4, rddwireErr, rddwireErr,
 		},
 	}
 
@@ -163,9 +163,9 @@ func TestFilterClearWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.writeErr {
 				t.Errorf("BtcEncode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.writeErr)
@@ -174,7 +174,7 @@ func TestFilterClearWireErrors(t *testing.T) {
 		}
 
 		// Decode from wire format.
-		var msg btcwire.MsgFilterClear
+		var msg rddwire.MsgFilterClear
 		r := newFixedReader(test.max, test.buf)
 		err = msg.BtcDecode(r, test.pver)
 		if reflect.TypeOf(err) != reflect.TypeOf(test.readErr) {
@@ -183,9 +183,9 @@ func TestFilterClearWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.readErr {
 				t.Errorf("BtcDecode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.readErr)

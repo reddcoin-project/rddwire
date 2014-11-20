@@ -2,7 +2,7 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-package btcwire_test
+package rddwire_test
 
 import (
 	"bytes"
@@ -12,17 +12,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/conformal/btcwire"
+	"github.com/reddcoin-project/rddwire"
 	"github.com/davecgh/go-spew/spew"
 )
 
 // TestAddr tests the MsgAddr API.
 func TestAddr(t *testing.T) {
-	pver := btcwire.ProtocolVersion
+	pver := rddwire.ProtocolVersion
 
 	// Ensure the command is expected value.
 	wantCmd := "addr"
-	msg := btcwire.NewMsgAddr()
+	msg := rddwire.NewMsgAddr()
 	if cmd := msg.Command(); cmd != wantCmd {
 		t.Errorf("NewMsgAddr: wrong command - got %v want %v",
 			cmd, wantCmd)
@@ -40,7 +40,7 @@ func TestAddr(t *testing.T) {
 
 	// Ensure NetAddresses are added properly.
 	tcpAddr := &net.TCPAddr{IP: net.ParseIP("127.0.0.1"), Port: 8333}
-	na, err := btcwire.NewNetAddress(tcpAddr, btcwire.SFNodeNetwork)
+	na, err := rddwire.NewNetAddress(tcpAddr, rddwire.SFNodeNetwork)
 	if err != nil {
 		t.Errorf("NewNetAddress: %v", err)
 	}
@@ -63,7 +63,7 @@ func TestAddr(t *testing.T) {
 
 	// Ensure adding more than the max allowed addresses per message returns
 	// error.
-	for i := 0; i < btcwire.MaxAddrPerMsg+1; i++ {
+	for i := 0; i < rddwire.MaxAddrPerMsg+1; i++ {
 		err = msg.AddAddress(na)
 	}
 	if err == nil {
@@ -79,7 +79,7 @@ func TestAddr(t *testing.T) {
 	// Ensure max payload is expected value for protocol versions before
 	// timestamp was added to NetAddress.
 	// Num addresses (varInt) + max allowed addresses.
-	pver = btcwire.NetAddressTimeVersion - 1
+	pver = rddwire.NetAddressTimeVersion - 1
 	wantPayload = uint32(26009)
 	maxPayload = msg.MaxPayloadLength(pver)
 	if maxPayload != wantPayload {
@@ -91,7 +91,7 @@ func TestAddr(t *testing.T) {
 	// Ensure max payload is expected value for protocol versions before
 	// multiple addresses were allowed.
 	// Num addresses (varInt) + a single net addresses.
-	pver = btcwire.MultipleAddressVersion - 1
+	pver = rddwire.MultipleAddressVersion - 1
 	wantPayload = uint32(35)
 	maxPayload = msg.MaxPayloadLength(pver)
 	if maxPayload != wantPayload {
@@ -107,27 +107,27 @@ func TestAddr(t *testing.T) {
 // of addreses and protocol versions.
 func TestAddrWire(t *testing.T) {
 	// A couple of NetAddresses to use for testing.
-	na := &btcwire.NetAddress{
+	na := &rddwire.NetAddress{
 		Timestamp: time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("127.0.0.1"),
 		Port:      8333,
 	}
-	na2 := &btcwire.NetAddress{
+	na2 := &rddwire.NetAddress{
 		Timestamp: time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("192.168.0.1"),
 		Port:      8334,
 	}
 
 	// Empty address message.
-	noAddr := btcwire.NewMsgAddr()
+	noAddr := rddwire.NewMsgAddr()
 	noAddrEncoded := []byte{
 		0x00, // Varint for number of addresses
 	}
 
 	// Address message with multiple addresses.
-	multiAddr := btcwire.NewMsgAddr()
+	multiAddr := rddwire.NewMsgAddr()
 	multiAddr.AddAddresses(na, na2)
 	multiAddrEncoded := []byte{
 		0x02,                   // Varint for number of addresses
@@ -145,8 +145,8 @@ func TestAddrWire(t *testing.T) {
 	}
 
 	tests := []struct {
-		in   *btcwire.MsgAddr // Message to encode
-		out  *btcwire.MsgAddr // Expected decoded message
+		in   *rddwire.MsgAddr // Message to encode
+		out  *rddwire.MsgAddr // Expected decoded message
 		buf  []byte           // Wire encoding
 		pver uint32           // Protocol version for wire encoding
 	}{
@@ -155,7 +155,7 @@ func TestAddrWire(t *testing.T) {
 			noAddr,
 			noAddr,
 			noAddrEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Latest protocol version with multiple addresses.
@@ -163,7 +163,7 @@ func TestAddrWire(t *testing.T) {
 			multiAddr,
 			multiAddr,
 			multiAddrEncoded,
-			btcwire.ProtocolVersion,
+			rddwire.ProtocolVersion,
 		},
 
 		// Protocol version MultipleAddressVersion-1 with no addresses.
@@ -171,7 +171,7 @@ func TestAddrWire(t *testing.T) {
 			noAddr,
 			noAddr,
 			noAddrEncoded,
-			btcwire.MultipleAddressVersion - 1,
+			rddwire.MultipleAddressVersion - 1,
 		},
 	}
 
@@ -191,7 +191,7 @@ func TestAddrWire(t *testing.T) {
 		}
 
 		// Decode the message from wire format.
-		var msg btcwire.MsgAddr
+		var msg rddwire.MsgAddr
 		rbuf := bytes.NewReader(test.buf)
 		err = msg.BtcDecode(rbuf, test.pver)
 		if err != nil {
@@ -209,26 +209,26 @@ func TestAddrWire(t *testing.T) {
 // TestAddrWireErrors performs negative tests against wire encode and decode
 // of MsgAddr to confirm error paths work correctly.
 func TestAddrWireErrors(t *testing.T) {
-	pver := btcwire.ProtocolVersion
-	pverMA := btcwire.MultipleAddressVersion
-	btcwireErr := &btcwire.MessageError{}
+	pver := rddwire.ProtocolVersion
+	pverMA := rddwire.MultipleAddressVersion
+	rddwireErr := &rddwire.MessageError{}
 
 	// A couple of NetAddresses to use for testing.
-	na := &btcwire.NetAddress{
+	na := &rddwire.NetAddress{
 		Timestamp: time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("127.0.0.1"),
 		Port:      8333,
 	}
-	na2 := &btcwire.NetAddress{
+	na2 := &rddwire.NetAddress{
 		Timestamp: time.Unix(0x495fab29, 0), // 2009-01-03 12:15:05 -0600 CST
-		Services:  btcwire.SFNodeNetwork,
+		Services:  rddwire.SFNodeNetwork,
 		IP:        net.ParseIP("192.168.0.1"),
 		Port:      8334,
 	}
 
 	// Address message with multiple addresses.
-	baseAddr := btcwire.NewMsgAddr()
+	baseAddr := rddwire.NewMsgAddr()
 	baseAddr.AddAddresses(na, na2)
 	baseAddrEncoded := []byte{
 		0x02,                   // Varint for number of addresses
@@ -247,8 +247,8 @@ func TestAddrWireErrors(t *testing.T) {
 
 	// Message that forces an error by having more than the max allowed
 	// addresses.
-	maxAddr := btcwire.NewMsgAddr()
-	for i := 0; i < btcwire.MaxAddrPerMsg; i++ {
+	maxAddr := rddwire.NewMsgAddr()
+	for i := 0; i < rddwire.MaxAddrPerMsg; i++ {
 		maxAddr.AddAddress(na)
 	}
 	maxAddr.AddrList = append(maxAddr.AddrList, na)
@@ -257,7 +257,7 @@ func TestAddrWireErrors(t *testing.T) {
 	}
 
 	tests := []struct {
-		in       *btcwire.MsgAddr // Value to encode
+		in       *rddwire.MsgAddr // Value to encode
 		buf      []byte           // Wire encoding
 		pver     uint32           // Protocol version for wire encoding
 		max      int              // Max size of fixed buffer to induce errors
@@ -270,10 +270,10 @@ func TestAddrWireErrors(t *testing.T) {
 		// Force error in address list.
 		{baseAddr, baseAddrEncoded, pver, 1, io.ErrShortWrite, io.EOF},
 		// Force error with greater than max inventory vectors.
-		{maxAddr, maxAddrEncoded, pver, 3, btcwireErr, btcwireErr},
+		{maxAddr, maxAddrEncoded, pver, 3, rddwireErr, rddwireErr},
 		// Force error with greater than max inventory vectors for
 		// protocol versions before multiple addresses were allowed.
-		{maxAddr, maxAddrEncoded, pverMA - 1, 3, btcwireErr, btcwireErr},
+		{maxAddr, maxAddrEncoded, pverMA - 1, 3, rddwireErr, rddwireErr},
 	}
 
 	t.Logf("Running %d tests", len(tests))
@@ -287,9 +287,9 @@ func TestAddrWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.writeErr {
 				t.Errorf("BtcEncode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.writeErr)
@@ -298,7 +298,7 @@ func TestAddrWireErrors(t *testing.T) {
 		}
 
 		// Decode from wire format.
-		var msg btcwire.MsgAddr
+		var msg rddwire.MsgAddr
 		r := newFixedReader(test.max, test.buf)
 		err = msg.BtcDecode(r, test.pver)
 		if reflect.TypeOf(err) != reflect.TypeOf(test.readErr) {
@@ -307,9 +307,9 @@ func TestAddrWireErrors(t *testing.T) {
 			continue
 		}
 
-		// For errors which are not of type btcwire.MessageError, check
+		// For errors which are not of type rddwire.MessageError, check
 		// them for equality.
-		if _, ok := err.(*btcwire.MessageError); !ok {
+		if _, ok := err.(*rddwire.MessageError); !ok {
 			if err != test.readErr {
 				t.Errorf("BtcDecode #%d wrong error got: %v, "+
 					"want: %v", i, err, test.readErr)
