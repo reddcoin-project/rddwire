@@ -284,7 +284,7 @@ func TestAlert(t *testing.T) {
 	alert := rddwire.NewAlert(
 		1, 1337093712, 1368628812, 1015,
 		1013, []int32{1014}, 0, 40599, []string{"/Satoshi:0.7.2/"}, 5000, "",
-		"URGENT: upgrade required, see http://bitcoin.org/dos for details",
+		"URGENT: upgrade required, see http://Reddcoin.org/dos for details",
 	)
 	w := new(bytes.Buffer)
 	err := alert.Serialize(w, pver)

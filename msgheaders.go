@@ -10,10 +10,10 @@ import (
 )
 
 // MaxBlockHeadersPerMsg is the maximum number of block headers that can be in
-// a single bitcoin headers message.
+// a single Reddcoin headers message.
 const MaxBlockHeadersPerMsg = 2000
 
-// MsgHeaders implements the Message interface and represents a bitcoin headers
+// MsgHeaders implements the Message interface and represents a Reddcoin headers
 // message.  It is used to deliver block header information in response
 // to a getheaders message (MsgGetHeaders).  The maximum number of block headers
 // per message is currently 2000.  See MsgGetHeaders for details on requesting
@@ -34,7 +34,7 @@ func (msg *MsgHeaders) AddBlockHeader(bh *BlockHeader) error {
 	return nil
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the Reddcoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 func (msg *MsgHeaders) BtcDecode(r io.Reader, pver uint32) error {
 	count, err := readVarInt(r, pver)
@@ -74,7 +74,7 @@ func (msg *MsgHeaders) BtcDecode(r io.Reader, pver uint32) error {
 	return nil
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the Reddcoin protocol encoding.
 // This is part of the Message interface implementation.
 func (msg *MsgHeaders) BtcEncode(w io.Writer, pver uint32) error {
 	// Limit to max block headers per message.
@@ -125,7 +125,7 @@ func (msg *MsgHeaders) MaxPayloadLength(pver uint32) uint32 {
 		MaxBlockHeadersPerMsg)
 }
 
-// NewMsgHeaders returns a new bitcoin headers message that conforms to the
+// NewMsgHeaders returns a new Reddcoin headers message that conforms to the
 // Message interface.  See MsgHeaders for details.
 func NewMsgHeaders() *MsgHeaders {
 	return &MsgHeaders{

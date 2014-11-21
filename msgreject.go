@@ -46,7 +46,7 @@ func (code RejectCode) String() string {
 	return fmt.Sprintf("Unknown RejectCode (%d)", uint8(code))
 }
 
-// MsgReject implements the Message interface and represents a bitcoin reject
+// MsgReject implements the Message interface and represents a Reddcoin reject
 // message.
 //
 // This message was not added until protocol version RejectVersion.
@@ -69,7 +69,7 @@ type MsgReject struct {
 	Hash ShaHash
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the Reddcoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 func (msg *MsgReject) BtcDecode(r io.Reader, pver uint32) error {
 	if pver < RejectVersion {
@@ -111,7 +111,7 @@ func (msg *MsgReject) BtcDecode(r io.Reader, pver uint32) error {
 	return nil
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the Reddcoin protocol encoding.
 // This is part of the Message interface implementation.
 func (msg *MsgReject) BtcEncode(w io.Writer, pver uint32) error {
 	if pver < RejectVersion {
@@ -164,7 +164,7 @@ func (msg *MsgReject) MaxPayloadLength(pver uint32) uint32 {
 	// The reject message did not exist before protocol version
 	// RejectVersion.
 	if pver >= RejectVersion {
-		// Unfortunately the bitcoin protocol does not enforce a sane
+		// Unfortunately the Reddcoin protocol does not enforce a sane
 		// limit on the length of the reason, so the max payload is the
 		// overall maximum message payload.
 		plen = MaxMessagePayload
@@ -173,7 +173,7 @@ func (msg *MsgReject) MaxPayloadLength(pver uint32) uint32 {
 	return plen
 }
 
-// NewMsgReject returns a new bitcoin reject message that conforms to the
+// NewMsgReject returns a new Reddcoin reject message that conforms to the
 // Message interface.  See MsgReject for details.
 func NewMsgReject(command string, code RejectCode, reason string) *MsgReject {
 	return &MsgReject{

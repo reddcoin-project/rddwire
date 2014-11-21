@@ -40,7 +40,7 @@ const (
 	RejectVersion uint32 = 70002
 )
 
-// ServiceFlag identifies services supported by a bitcoin peer.
+// ServiceFlag identifies services supported by a Reddcoin peer.
 type ServiceFlag uint64
 
 const (
@@ -78,41 +78,41 @@ func (f ServiceFlag) String() string {
 	return s
 }
 
-// BitcoinNet represents which bitcoin network a message belongs to.
-type BitcoinNet uint32
+// ReddcoinNet represents which Reddcoin network a message belongs to.
+type ReddcoinNet uint32
 
-// Constants used to indicate the message bitcoin network.  They can also be
+// Constants used to indicate the message Reddcoin network.  They can also be
 // used to seek to the next message when a stream's state is unknown, but
 // this package does not provide that functionality since it's generally a
 // better idea to simply disconnect clients that are misbehaving over TCP.
 const (
-	// MainNet represents the main bitcoin network.
-	MainNet BitcoinNet = 0xdbb6c0fb
+	// MainNet represents the main Reddcoin network.
+	MainNet ReddcoinNet = 0xdbb6c0fb
 
 	// TestNet represents the regression test network.
-	TestNet BitcoinNet = 0xdeb9c3fe
+	TestNet ReddcoinNet = 0xdeb9c3fe
 
 	// TestNet3 represents the test network (version 3).
-	TestNet3 BitcoinNet = 0x0709110b
+	TestNet3 ReddcoinNet = 0x0709110b
 
 	// SimNet represents the simulation test network.
-	SimNet BitcoinNet = 0x12141c16
+	SimNet ReddcoinNet = 0x12141c16
 )
 
-// bnStrings is a map of bitcoin networks back to their constant names for
+// bnStrings is a map of Reddcoin networks back to their constant names for
 // pretty printing.
-var bnStrings = map[BitcoinNet]string{
+var bnStrings = map[ReddcoinNet]string{
 	MainNet:  "MainNet",
 	TestNet:  "TestNet",
 	TestNet3: "TestNet3",
 	SimNet:   "SimNet",
 }
 
-// String returns the BitcoinNet in human-readable form.
-func (n BitcoinNet) String() string {
+// String returns the ReddcoinNet in human-readable form.
+func (n ReddcoinNet) String() string {
 	if s, ok := bnStrings[n]; ok {
 		return s
 	}
 
-	return fmt.Sprintf("Unknown BitcoinNet (%d)", uint32(n))
+	return fmt.Sprintf("Unknown ReddcoinNet (%d)", uint32(n))
 }

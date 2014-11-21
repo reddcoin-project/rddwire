@@ -32,17 +32,17 @@ func TestServiceFlagStringer(t *testing.T) {
 	}
 }
 
-// TestBitcoinNetStringer tests the stringized output for bitcoin net types.
-func TestBitcoinNetStringer(t *testing.T) {
+// TestReddcoinNetStringer tests the stringized output for Reddcoin net types.
+func TestReddcoinNetStringer(t *testing.T) {
 	tests := []struct {
-		in   rddwire.BitcoinNet
+		in   rddwire.ReddcoinNet
 		want string
 	}{
 		{rddwire.MainNet, "MainNet"},
 		{rddwire.TestNet, "TestNet"},
 		{rddwire.TestNet3, "TestNet3"},
 		{rddwire.SimNet, "SimNet"},
-		{0xffffffff, "Unknown BitcoinNet (4294967295)"},
+		{0xffffffff, "Unknown ReddcoinNet (4294967295)"},
 	}
 
 	t.Logf("Running %d tests", len(tests))

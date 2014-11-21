@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-// MsgGetHeaders implements the Message interface and represents a bitcoin
+// MsgGetHeaders implements the Message interface and represents a Reddcoin
 // getheaders message.  It is used to request a list of block headers for
 // blocks starting after the last known hash in the slice of block locator
 // hashes.  The list is returned via a headers message (MsgHeaders) and is
@@ -43,7 +43,7 @@ func (msg *MsgGetHeaders) AddBlockLocatorHash(hash *ShaHash) error {
 	return nil
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the Reddcoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 func (msg *MsgGetHeaders) BtcDecode(r io.Reader, pver uint32) error {
 	err := readElement(r, &msg.ProtocolVersion)
@@ -80,7 +80,7 @@ func (msg *MsgGetHeaders) BtcDecode(r io.Reader, pver uint32) error {
 	return nil
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the Reddcoin protocol encoding.
 // This is part of the Message interface implementation.
 func (msg *MsgGetHeaders) BtcEncode(w io.Writer, pver uint32) error {
 	// Limit to max block locator hashes per message.
@@ -130,7 +130,7 @@ func (msg *MsgGetHeaders) MaxPayloadLength(pver uint32) uint32 {
 	return 4 + MaxVarIntPayload + (MaxBlockLocatorsPerMsg * HashSize) + HashSize
 }
 
-// NewMsgGetHeaders returns a new bitcoin getheaders message that conforms to
+// NewMsgGetHeaders returns a new Reddcoin getheaders message that conforms to
 // the Message interface.  See MsgGetHeaders for details.
 func NewMsgGetHeaders() *MsgGetHeaders {
 	return &MsgGetHeaders{

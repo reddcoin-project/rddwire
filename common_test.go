@@ -126,7 +126,7 @@ func TestElementWire(t *testing.T) {
 			[]byte{0x01, 0x00, 0x00, 0x00},
 		},
 		{
-			rddwire.BitcoinNet(rddwire.MainNet),
+			rddwire.ReddcoinNet(rddwire.MainNet),
 			[]byte{0xfb, 0xc0, 0xb6, 0xdb},
 		},
 		// Type not supported by the "fast" path and requires reflection.
@@ -213,7 +213,7 @@ func TestElementWireErrors(t *testing.T) {
 		},
 		{rddwire.ServiceFlag(rddwire.SFNodeNetwork), 0, io.ErrShortWrite, io.EOF},
 		{rddwire.InvType(rddwire.InvTypeTx), 0, io.ErrShortWrite, io.EOF},
-		{rddwire.BitcoinNet(rddwire.MainNet), 0, io.ErrShortWrite, io.EOF},
+		{rddwire.ReddcoinNet(rddwire.MainNet), 0, io.ErrShortWrite, io.EOF},
 	}
 
 	t.Logf("Running %d tests", len(tests))

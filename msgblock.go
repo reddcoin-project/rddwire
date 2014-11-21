@@ -34,7 +34,7 @@ type TxLoc struct {
 	TxLen   int
 }
 
-// MsgBlock implements the Message interface and represents a bitcoin
+// MsgBlock implements the Message interface and represents a Reddcoin
 // block message.  It is used to deliver block and transaction information in
 // response to a getdata message (MsgGetData) for a given block hash.
 type MsgBlock struct {
@@ -55,7 +55,7 @@ func (msg *MsgBlock) ClearTransactions() {
 	msg.Transactions = make([]*MsgTx, 0, defaultTransactionAlloc)
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the Reddcoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 // See Deserialize for decoding blocks stored to disk, such as in a database, as
 // opposed to decoding blocks from the wire.
@@ -103,7 +103,7 @@ func (msg *MsgBlock) BtcDecode(r io.Reader, pver uint32) error {
 // Deserialize decodes a block from r into the receiver using a format that is
 // suitable for long-term storage such as a database while respecting the
 // Version field in the block.  This function differs from BtcDecode in that
-// BtcDecode decodes from the bitcoin wire protocol as it was sent across the
+// BtcDecode decodes from the Reddcoin wire protocol as it was sent across the
 // network.  The wire encoding can technically differ depending on the protocol
 // version and doesn't even really need to match the format of a stored block at
 // all.  As of the time this comment was written, the encoded block is the same
@@ -162,7 +162,7 @@ func (msg *MsgBlock) DeserializeTxLoc(r *bytes.Buffer) ([]TxLoc, error) {
 	return txLocs, nil
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the Reddcoin protocol encoding.
 // This is part of the Message interface implementation.
 // See Serialize for encoding blocks to be stored to disk, such as in a
 // database, as opposed to encoding blocks for the wire.
@@ -197,7 +197,7 @@ func (msg *MsgBlock) BtcEncode(w io.Writer, pver uint32) error {
 // Serialize encodes the block to w using a format that suitable for long-term
 // storage such as a database while respecting the Version field in the block.
 // This function differs from BtcEncode in that BtcEncode encodes the block to
-// the bitcoin wire protocol in order to be sent across the network.  The wire
+// the Reddcoin wire protocol in order to be sent across the network.  The wire
 // encoding can technically differ depending on the protocol version and doesn't
 // even really need to match the format of a stored block at all.  As of the
 // time this comment was written, the encoded block is the same in both
@@ -260,7 +260,7 @@ func (msg *MsgBlock) TxShas() ([]ShaHash, error) {
 	return shaList, nil
 }
 
-// NewMsgBlock returns a new bitcoin block message that conforms to the
+// NewMsgBlock returns a new Reddcoin block message that conforms to the
 // Message interface.  See MsgBlock for details.
 func NewMsgBlock(blockHeader *BlockHeader) *MsgBlock {
 	return &MsgBlock{

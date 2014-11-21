@@ -15,7 +15,7 @@ import (
 // 8 bits per byte.  Then an extra one to cover partials.
 const maxFlagsPerMerkleBlock = maxTxPerBlock / 8
 
-// MsgMerkleBlock implements the Message interface and represents a bitcoin
+// MsgMerkleBlock implements the Message interface and represents a Reddcoin
 // merkleblock message which is used to reset a Bloom filter.
 //
 // This message was not added until protocol version BIP0037Version.
@@ -38,7 +38,7 @@ func (msg *MsgMerkleBlock) AddTxHash(hash *ShaHash) error {
 	return nil
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the Reddcoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 func (msg *MsgMerkleBlock) BtcDecode(r io.Reader, pver uint32) error {
 	if pver < BIP0037Version {
@@ -87,7 +87,7 @@ func (msg *MsgMerkleBlock) BtcDecode(r io.Reader, pver uint32) error {
 	return nil
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the Reddcoin protocol encoding.
 // This is part of the Message interface implementation.
 func (msg *MsgMerkleBlock) BtcEncode(w io.Writer, pver uint32) error {
 	if pver < BIP0037Version {
@@ -155,7 +155,7 @@ func (msg *MsgMerkleBlock) MaxPayloadLength(pver uint32) uint32 {
 	return MaxBlockPayload
 }
 
-// NewMsgMerkleBlock returns a new bitcoin merkleblock message that conforms to
+// NewMsgMerkleBlock returns a new Reddcoin merkleblock message that conforms to
 // the Message interface.  See MsgMerkleBlock for details.
 func NewMsgMerkleBlock(bh *BlockHeader) *MsgMerkleBlock {
 	return &MsgMerkleBlock{

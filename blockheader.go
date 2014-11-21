@@ -20,7 +20,7 @@ const PowBlockVersion = 2
 // PrevBlock and MerkleRoot hashes.
 const MaxBlockHeaderPayload = 16 + (HashSize * 2)
 
-// BlockHeader defines information about a block and is used in the bitcoin
+// BlockHeader defines information about a block and is used in the Reddcoin
 // block (MsgBlock) and headers (MsgHeaders) messages.
 type BlockHeader struct {
 	// Version of the block.  This is not the same as the protocol version.
@@ -104,7 +104,7 @@ func NewBlockHeader(prevHash *ShaHash, merkleRootHash *ShaHash, bits uint32,
 	}
 }
 
-// readBlockHeader reads a bitcoin block header from r.  See Deserialize for
+// readBlockHeader reads a Reddcoin block header from r.  See Deserialize for
 // decoding block headers stored to disk, such as in a database, as opposed to
 // decoding from the wire.
 func readBlockHeader(r io.Reader, pver uint32, bh *BlockHeader) error {
@@ -119,7 +119,7 @@ func readBlockHeader(r io.Reader, pver uint32, bh *BlockHeader) error {
 	return nil
 }
 
-// writeBlockHeader writes a bitcoin block header to w.  See Serialize for
+// writeBlockHeader writes a Reddcoin block header to w.  See Serialize for
 // encoding block headers to be stored to disk, such as in a database, as
 // opposed to encoding for the wire.
 func writeBlockHeader(w io.Writer, pver uint32, bh *BlockHeader) error {

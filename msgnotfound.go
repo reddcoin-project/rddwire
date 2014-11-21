@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-// MsgNotFound defines a bitcoin notfound message which is sent in response to
+// MsgNotFound defines a Reddcoin notfound message which is sent in response to
 // a getdata message if any of the requested data in not available on the peer.
 // Each message is limited to a maximum number of inventory vectors, which is
 // currently 50,000.
@@ -32,7 +32,7 @@ func (msg *MsgNotFound) AddInvVect(iv *InvVect) error {
 	return nil
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the Reddcoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 func (msg *MsgNotFound) BtcDecode(r io.Reader, pver uint32) error {
 	count, err := readVarInt(r, pver)
@@ -59,7 +59,7 @@ func (msg *MsgNotFound) BtcDecode(r io.Reader, pver uint32) error {
 	return nil
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the Reddcoin protocol encoding.
 // This is part of the Message interface implementation.
 func (msg *MsgNotFound) BtcEncode(w io.Writer, pver uint32) error {
 	// Limit to max inventory vectors per message.
@@ -98,7 +98,7 @@ func (msg *MsgNotFound) MaxPayloadLength(pver uint32) uint32 {
 	return MaxVarIntPayload + (MaxInvPerMsg * maxInvVectPayload)
 }
 
-// NewMsgNotFound returns a new bitcoin notfound message that conforms to the
+// NewMsgNotFound returns a new Reddcoin notfound message that conforms to the
 // Message interface.  See MsgNotFound for details.
 func NewMsgNotFound() *MsgNotFound {
 	return &MsgNotFound{

@@ -20,11 +20,11 @@ const MaxHashStringSize = HashSize * 2
 // string that has too many characters.
 var ErrHashStrSize = fmt.Errorf("max hash string length is %v bytes", MaxHashStringSize)
 
-// ShaHash is used in several of the bitcoin messages and common structures.  It
+// ShaHash is used in several of the Reddcoin messages and common structures.  It
 // typically represents the double sha256 of data.
 type ShaHash [HashSize]byte
 
-// String returns the ShaHash in the standard bitcoin big-endian form.
+// String returns the ShaHash in the standard Reddcoin big-endian form.
 func (hash ShaHash) String() string {
 	hashstr := ""
 	for i := range hash {
@@ -71,7 +71,7 @@ func NewShaHash(newHash []byte) (*ShaHash, error) {
 	return &sh, err
 }
 
-// NewShaHashFromStr converts a hash string in the standard bitcoin big-endian
+// NewShaHashFromStr converts a hash string in the standard Reddcoin big-endian
 // form to a ShaHash (which is little-endian).
 func NewShaHashFromStr(hash string) (*ShaHash, error) {
 	// Return error if hash string is too long.
